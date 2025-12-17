@@ -89,3 +89,99 @@ We have successfully decrypted the character back to the original 'T'. This proc
 ## Disclaimer
 
 **This implementation is for educational purposes only.** RC4 is known to have vulnerabilities and is not considered secure for modern applications. Do not use this code for protecting sensitive information in a real-world scenario. Always use well-vetted, standard cryptographic libraries like `cryptography` in Python for any real security needs.
+
+## Diagram Generation
+
+This project includes a Python script (`generate_diagram.py`) that uses the `diagrams` library to visualize the RC4 process. 
+
+### Requirements
+
+- Python 3.x
+- `diagrams` library (`pip install diagrams`)
+- Graphviz (see installation instructions below)
+
+### How to Generate the Diagrams
+
+1.  **Install Graphviz:**
+    -   **macOS (using Homebrew):**
+        ```bash
+        brew install graphviz
+        ```
+    -   **Debian/Ubuntu:**
+        ```bash
+        sudo apt-get install graphviz
+        ```
+    -   For other systems, refer to the [official Graphviz download page](https://graphviz.org/download/).
+
+2.  **Run the script:**
+    ```bash
+    python generate_diagram.py
+    ```
+
+This will create two files in the project directory:
+
+-   `rc4_flow_diagram.png`: Shows the high-level flow of the RC4 encryption process.
+-   `xor_operation_detail.png`: Provides a closer look at the byte-by-byte XOR operation.
+
+### Diagram Source Code
+
+```python
+# generate_diagram.py
+from diagrams import Diagram, Cluster
+from diagrams.programming.flowchart import Document, InputOutput, PredefinedProcess
+
+# This script requires the 'diagrams' library and graphviz to be installed.
+# You can install them with:
+# pip install diagrams
+#
+# On macOS, you can install graphviz with Homebrew:
+# brew install graphviz
+#
+# On Debian/Ubuntu, you can install graphviz with apt-get:
+# sudo apt-get install graphviz
+#
+# For other systems, please see the Graphviz installation instructions.
+
+# Diagram 1: Overall RC4 Flow
+with Diagram("RC4 Stream Cipher Flow", show=False, filename="rc4_flow_diagram", direction="LR"):
+    plaintext = Document("Plaintext")
+    secret_key = InputOutput("Secret Key")
+
+    with Cluster("RC4 Encryption Process (rc4 function)"):
+        # The two main algorithms within RC4
+        ksa_process = PredefinedProcess("1. Key-Scheduling\nAlgorithm (KSA)")
+        prga_process = PredefinedProcess("2. Pseudo-Random\nGeneration (PRGA)")
+        
+        # The operation that combines the keystream and plaintext
+        xor_operation = PredefinedProcess("3. XOR Operation")
+
+        # Data flow within the cluster
+        secret_key >> ksa_process >> prga_process
+        prga_process >> xor_operation
+
+    ciphertext = Document("Ciphertext")
+
+    # Connect the external inputs/outputs to the process
+    plaintext >> xor_operation
+    xor_operation >> ciphertext
+
+# Diagram 2: Detailed XOR Operation
+with Diagram("XOR Operation Details", show=False, filename="xor_operation_detail", direction="TB"):
+    plaintext_input = InputOutput("Plaintext / Ciphertext")
+    keystream_input = InputOutput("Keystream from PRGA")
+    
+    xor_node = PredefinedProcess("Byte-by-byte\nXOR")
+
+    ciphertext_output = Document("Ciphertext / Plaintext")
+
+    plaintext_input >> xor_node
+    keystream_input >> xor_node
+    xor_node >> ciphertext_output
+
+
+print("Diagram script 'generate_diagram.py' updated successfully.")
+print("Run 'python generate_diagram.py' to create two diagram files:")
+print("- rc4_flow_diagram.png (Overall flow)")
+print("- xor_operation_detail.png (XOR step details)")
+
+```
